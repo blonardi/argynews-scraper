@@ -1,30 +1,54 @@
 const PORT = 8000;
 
 const express = require("express");
-const axios = require("axios");
-const cheerio = require("cheerio");
-
 const app = express();
 
-const url = "https://www.infobae.com/";
-axios(url)
-    .then((res) => {
-        const html = res.data;
-        console.log(html);
-        const $ = cheerio.load(html);
-        const articles = [];
+const axios = require("axios");
+const cheerio = require("cheerio");
+const cors = require("cors");
 
-        $(".d23-story-card-info", html).each(function () {
-            const title = $(this).text();
-            const url = $(this).find("a").attr("href");
-            articles.push({
-                title,
-                url,
+const urlOle = "https://www.ole.com.ar";
+const claseOle = "";
+const urlNyt = "https://www.nytimes.com/es/";
+const claseNyt = "";
+const urlDia = "https://www.eldiaonline.com/";
+const claseDia = "";
+
+app.use(cors());
+
+// app.METHOD(PATH, HANDLER);
+
+app.get("/", function (req, res) {
+    res.json("This is my webscraper with node");
+});
+
+function solicitudURL(url, clase, res) {
+    axios(url)
+        .then((response) => {
+            const html = response.data;
+            const $ = cheerio.load(html);
+            const articles = [];
+
+            $(clase, html).each(function () {
+                const title = $(this).text();
+                const url = $(this).find("a").attr("href");
+                articles.push({
+                    title,
+                    url,
+                });
             });
-        });
+            console.log(articles);
+            res.json(articles);
+        })
+        .catch((err) => console.log(err));
+}
 
-        console.log(articles);
-    })
-    .catch((err) => console.log(err));
+app.get("/results", (req, res) => {
+    const urlInfobae = "https://www.infobae.com/";
+    const claseInfobae = ".d23-story-card-info";
+    solicitudURL(urlInfobae, claseInfobae, res);
+});
 
-app.listen(PORT, () => console.log(`server running in port: ${PORT}`));
+app.listen(PORT, () =>
+    console.log(`Servidor escuchando en el puerto : ${PORT}`)
+);
