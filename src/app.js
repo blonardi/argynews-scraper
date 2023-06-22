@@ -8,7 +8,7 @@ fetch("http://localhost:8000/results")
     .then((response) => response.json())
     .then((data) => {
         data.forEach((article) => {
-            // console.log(article.url);
+            console.log(article.url);
             const articleItem =
                 `<div style="width:100%"><h3>` +
                 article.title +
