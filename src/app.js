@@ -11,9 +11,9 @@ fetch("http://localhost:8000/results")
             console.log(article.url);
             const articleItem =
                 `<div style="width:100%"><h3>` +
-                article.title +
+                article.titulo +
                 `</h3><p>` +
-                article.url +
+                article.uerrele +
                 `</p></div>`;
             feedDisplay.insertAdjacentHTML("beforeend", articleItem);
         });
