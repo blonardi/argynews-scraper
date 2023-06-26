@@ -43,6 +43,24 @@ const dataInfobae = {
     href: "href",
 };
 
+const dataCNN = {
+    name: "CNN",
+    url: "https://cnnespanol.cnn.com/",
+    clase1: ".news__data",
+    clase2: ".news__title",
+    clase3: ".news__title > a",
+    href: "href",
+};
+
+const dataAmbito = {
+    name: "Ambito Financiero",
+    url: "https://www.ambito.com/",
+    clase1: ".news-article__info-wrapper",
+    clase2: ".news-article__title",
+    clase3: ".news-article__title > a",
+    href: "href",
+};
+
 const dataGuardian = {
     name: "Guardian",
     url: "https://www.theguardian.com/uk",
@@ -95,7 +113,7 @@ app.get("/", function (req, res) {
 //         });
 //     }
 // }
-const container = []
+const container = [];
 async function solicitudURL(siteData, res) {
     // siteData.forEach((siteObject) => {
     const { name, url, clase1, clase2, clase3, href } = siteData;
@@ -106,9 +124,12 @@ async function solicitudURL(siteData, res) {
             const articles = [];
             $(clase1, html).each(function () {
                 const item = $(this).find(clase2);
-                const url = item.attr(href) || $(this).attr(href);
                 const title =
                     item.find(clase3).text() || $(this).find(clase3).text();
+                const url =
+                    item.attr(href) ||
+                    $(this).attr(href) ||
+                    $(this).find(clase3).attr(href);
 
                 // esta es la url completa, en el back anda ok, pero no renderiza en front => undefined
                 articles.push({
@@ -117,12 +138,11 @@ async function solicitudURL(siteData, res) {
                 });
             });
             const firstArticles = articles.slice(0, 5);
-            const newPage = {name, firstArticles}
-            container.push(newPage)
+            const newPage = { name, firstArticles };
+            container.push(newPage);
             // return firstArticles
             // return { site: name, articles };
         });
-        
     } catch (err) {
         console.error(err);
         res.status(500).json({
@@ -134,8 +154,9 @@ async function solicitudURL(siteData, res) {
 app.get("/results", async (req, res) => {
     await solicitudURL(dataInfobae, res);
     await solicitudURL(dataGuardian, res);
-    res.json(container)
-    
+    await solicitudURL(dataCNN, res);
+    await solicitudURL(dataAmbito, res);
+    res.json(container);
 });
 
 app.listen(PORT, () =>
