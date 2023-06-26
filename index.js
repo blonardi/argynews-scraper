@@ -7,32 +7,32 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 const cors = require("cors");
 
-// const dataUrl = [
-//     {
-//         url: "https://www.infobae.com.ar",
-//         clase1: ".d23-story-card-info",
-//         clase2: "a.headline-link",
-//         clase3: "aria-label",
-//         href: "href",
-//     },
+/*  const dataUrl = [
+     {
+         url: "https://www.infobae.com.ar",
+         clase1: ".d23-story-card-info",
+         clase2: "a.headline-link",
+         clase3: "aria-label",
+         href: "href",
+     },
 
-//     {
-//         url: "https://www.nytimes.com/es",
-//         clase1: ".d23-story-card-info",
-//         clase2: "a.headline-link",
-//         clase3: "aria-label",
-//         href: "href",
-//     },
+     {
+         url: "https://www.nytimes.com/es",
+         clase1: ".d23-story-card-info",
+         clase2: "a.headline-link",
+         clase3: "aria-label",
+         href: "href",
+     },
 
-//     {
-//         url: "https://www.eldiaonline.com",
-//         clase1: ".d23-story-card-info",
-//         clase2: "a.headline-link",
-//         clase3: "aria-label",
-//         href: "href",
-//         noticias : [noticia1, noticia2]
-//     },
-// ];
+     {
+         url: "https://www.eldiaonline.com",
+         clase1: ".d23-story-card-info",
+         clase2: "a.headline-link",
+         clase3: "aria-label",
+         href: "href",
+         noticias : [noticia1, noticia2]
+     },
+ ]; */
 
 const dataInfobae = {
     name: "Infobae",
@@ -95,8 +95,8 @@ app.get("/", function (req, res) {
 //         });
 //     }
 // }
-
-async function solicitudUrlNytimes(siteData, res) {
+const container = []
+async function solicitudURL(siteData, res) {
     // siteData.forEach((siteObject) => {
     const { name, url, clase1, clase2, clase3, href } = siteData;
     try {
@@ -117,10 +117,12 @@ async function solicitudUrlNytimes(siteData, res) {
                 });
             });
             const firstArticles = articles.slice(0, 5);
-            // console.log(firstArticles);
-            res.json(firstArticles);
-            return { site: name, articles };
+            const newPage = {name, firstArticles}
+            container.push(newPage)
+            // return firstArticles
+            // return { site: name, articles };
         });
+        
     } catch (err) {
         console.error(err);
         res.status(500).json({
@@ -129,9 +131,11 @@ async function solicitudUrlNytimes(siteData, res) {
     }
 }
 
-app.get("/results", (req, res) => {
-    // solicitudUrlNytimes(dataInfobae, res);
-    solicitudUrlNytimes(dataGuardian, res);
+app.get("/results", async (req, res) => {
+    await solicitudURL(dataInfobae, res);
+    await solicitudURL(dataGuardian, res);
+    res.json(container)
+    
 });
 
 app.listen(PORT, () =>

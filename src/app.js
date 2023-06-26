@@ -4,9 +4,10 @@ const feedDisplay = document.querySelector("#feed");
 
 const myUrl = "http://localhost:8000/results";
 
-fetch("http://localhost:8000/results")
+/* fetch("http://localhost:8000/results")
     .then((response) => response.json())
-    .then((data) => {
+    .then((data) => { allArticles.push(data)
+        
         data.forEach((article) => {
             console.log(article.url);
             const articleItem =
@@ -18,4 +19,19 @@ fetch("http://localhost:8000/results")
             feedDisplay.insertAdjacentHTML("beforeend", articleItem);
         });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => console.log(err)); */
+
+async function getArticles () {
+    const response = await fetch(myUrl)
+    const allArticles = await response.json()
+    return allArticles
+}
+
+
+async function createArticles () {
+    const allArticles = await getArticles()
+    const infobae = allArticles.filter(item => item[0] === 'Infobae')
+    const guardian = allArticles.filter(item => item[0] === 'Guardian')
+}
+
+createArticles()
