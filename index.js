@@ -113,6 +113,11 @@ app.get("/", function (req, res) {
 //         });
 //     }
 // }
+function sanitizerText(texto) {
+    // asercion, va a empezar o finalizar con x cosa
+    const sanitiziedText = texto.replace(/\t+/g, " ").trim();
+    return sanitiziedText;
+}
 const container = [];
 async function solicitudURL(siteData, res) {
     // siteData.forEach((siteObject) => {
@@ -130,10 +135,10 @@ async function solicitudURL(siteData, res) {
                     item.attr(href) ||
                     $(this).attr(href) ||
                     $(this).find(clase3).attr(href);
-
+                const sanitiziedText = sanitizerText(title);
                 // esta es la url completa, en el back anda ok, pero no renderiza en front => undefined
                 articles.push({
-                    title,
+                    sanitiziedText,
                     url,
                 });
             });
