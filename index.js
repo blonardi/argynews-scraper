@@ -38,8 +38,11 @@ const dataInfobae = {
     name: "Infobae",
     url: "https://www.infobae.com",
     // clase1: ".d23-story-card-info",
-    clase1: "a.headline-link",
+    //clase1: "a.headline-link",
+    clase1: ".d23-story-card-ctn",
+    clase2: ".a.headline-link",
     clase3: ".d23-story-card-hl",
+    imgClase: ".d23-story-card-info a .d23-story-card-img",
     href: "href",
 };
 
@@ -55,9 +58,11 @@ const dataCNN = {
 const dataAmbito = {
     name: "Ambito Financiero",
     url: "https://www.ambito.com/",
-    clase1: ".news-article__info-wrapper",
+    //clase1: ".news-article__info-wrapper",
+    clase1: ".news-article",
     clase2: ".news-article__title",
     clase3: ".news-article__title > a",
+    imgClase: "figure a .img-fluid",
     href: "href",
 };
 
@@ -119,27 +124,30 @@ function sanitizerText(texto) {
     return sanitiziedText;
 }
 const container = [];
+
 async function solicitudURL(siteData, res) {
     // siteData.forEach((siteObject) => {
-    const { name, url, clase1, clase2, clase3, href } = siteData;
+    const { name, url, clase1, clase2, clase3, imgClase, href } = siteData;
     try {
         await axios(url).then((response) => {
             const html = response.data;
             const $ = cheerio.load(html);
             const articles = [];
             $(clase1, html).each(function () {
+                const image = $(this).find(imgClase).attr('src')
                 const item = $(this).find(clase2);
-                const title =
-                    item.find(clase3).text() || $(this).find(clase3).text();
+                const titleReceived = item.find(clase3).text() || $(this).find(clase3).text();
+                const title = sanitizerText(titleReceived);
                 const url =
                     item.attr(href) ||
                     $(this).attr(href) ||
                     $(this).find(clase3).attr(href);
-                const sanitiziedText = sanitizerText(title);
+                
                 // esta es la url completa, en el back anda ok, pero no renderiza en front => undefined
                 articles.push({
-                    sanitiziedText,
+                    title,
                     url,
+                    image
                 });
             });
             const firstArticles = articles.slice(0, 5);
@@ -158,9 +166,9 @@ async function solicitudURL(siteData, res) {
 
 app.get("/results", async (req, res) => {
     await solicitudURL(dataInfobae, res);
-    await solicitudURL(dataGuardian, res);
+    /* await solicitudURL(dataGuardian, res);
     await solicitudURL(dataCNN, res);
-    await solicitudURL(dataAmbito, res);
+    await solicitudURL(dataAmbito, res); */
     res.json(container);
 });
 
