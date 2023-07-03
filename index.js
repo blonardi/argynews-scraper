@@ -7,44 +7,36 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 const cors = require("cors");
 
-/*  const dataUrl = [
-     {
-         url: "https://www.infobae.com.ar",
-         clase1: ".d23-story-card-info",
-         clase2: "a.headline-link",
-         clase3: "aria-label",
-         href: "href",
-     },
-
-     {
-         url: "https://www.nytimes.com/es",
-         clase1: ".d23-story-card-info",
-         clase2: "a.headline-link",
-         clase3: "aria-label",
-         href: "href",
-     },
-
-     {
-         url: "https://www.eldiaonline.com",
-         clase1: ".d23-story-card-info",
-         clase2: "a.headline-link",
-         clase3: "aria-label",
-         href: "href",
-         noticias : [noticia1, noticia2]
-     },
- ]; */
-
 const dataInfobae = {
     name: "Infobae",
     url: "https://www.infobae.com",
-    // clase1: ".d23-story-card-info",
-    //clase1: "a.headline-link",
     clase1: ".d23-story-card-ctn",
-    clase2: ".a.headline-link",
+    clase2: "a.headline-link",
     clase3: ".d23-story-card-hl",
     imgClase: ".d23-story-card-info a .d23-story-card-img",
     href: "href",
 };
+
+const dataPagina12 = {
+    name: 'Pagina 12',
+    url: 'https://www.pagina12.com.ar/',
+    clase1: "article",
+    clase2: ".article-title",
+    clase3: "h2 a",
+    imgClase: ".show-for-small-only ",
+    href: "href",
+}
+
+const dataClarin = {
+    name: 'Clarin',
+    url: 'https://www.clarin.com/',
+    clase1: ".content-nota",
+    clase2: ".mt",
+    clase3: "h2",
+    imgClase: "picture img",
+    urlClase: '.link_article',
+    href: "href",
+}
 
 const dataCNN = {
     name: "CNN",
@@ -58,20 +50,11 @@ const dataCNN = {
 const dataAmbito = {
     name: "Ambito Financiero",
     url: "https://www.ambito.com/",
-    //clase1: ".news-article__info-wrapper",
     clase1: ".news-article",
-    clase2: ".news-article__title",
+    clase2: ".news-article__info-wrapper",
     clase3: ".news-article__title > a",
-    imgClase: "figure a .img-fluid",
-    href: "href",
-};
-
-const dataGuardian = {
-    name: "Guardian",
-    url: "https://www.theguardian.com/uk",
-    clase1: ".fc-item__title",
-    clase2: ".fc-item__link",
-    clase3: ".js-headline-text",
+    imgClase: "a > .figure-img",
+    urlClase: 'figure a',
     href: "href",
 };
 
@@ -83,41 +66,6 @@ app.get("/", function (req, res) {
     res.json("This is my webscraper with node");
 });
 
-// async function solicitudURL(siteData, res) {
-//     // siteData.forEach((siteObject) => {
-//     const { url, clase1, clase2, clase3, href } = siteData;
-//     try {
-//         await axios(url).then((response) => {
-//             const html = response.data;
-//             const $ = cheerio.load(html);
-//             const articles = [];
-//             $(clase1, html).each(function () {
-//                 // const titulo = $(this).text();
-//                 // const uerrele = $(this).find("a").attr(href);
-//                 const headlinesElement = $(this).find(clase2);
-//                 headlinesElement.each((index, value) => {
-//                     const title = $(value).attr(clase3);
-//                     const urlFirst = $(value).attr(href);
-//                     const urlTotal = `${url}${urlFirst}`;
-//                     // esta es la url completa, en el back anda ok, pero no renderiza en front => undefined
-//                     articles.push({
-//                         title,
-//                         urlTotal,
-//                         // titulo,
-//                         // uerrele,
-//                     });
-//                 });
-//             });
-//             const firstArticles = articles.slice(0, 5);
-//             res.json(firstArticles);
-//         });
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({
-//             error: "Ocurrió un error en la solicitud.",
-//         });
-//     }
-// }
 function sanitizerText(texto) {
     // asercion, va a empezar o finalizar con x cosa
     const sanitiziedText = texto.replace(/\t+/g, " ").trim();
@@ -127,21 +75,25 @@ const container = [];
 
 async function solicitudURL(siteData, res) {
     // siteData.forEach((siteObject) => {
-    const { name, url, clase1, clase2, clase3, imgClase, href } = siteData;
+    const { name, url, clase1, clase2, clase3, imgClase, href, urlClase } = siteData;
     try {
         await axios(url).then((response) => {
             const html = response.data;
             const $ = cheerio.load(html);
             const articles = [];
+            
             $(clase1, html).each(function () {
                 const image = $(this).find(imgClase).attr('src')
-                const item = $(this).find(clase2);
-                const titleReceived = item.find(clase3).text() || $(this).find(clase3).text();
+                const divCard = $(this).find(clase2);
+                const titleReceived = divCard.find(clase3).text() || $(this).find(clase3).text();
+                // titleReceived = $(this).find().text
                 const title = sanitizerText(titleReceived);
+                
                 const url =
-                    item.attr(href) ||
+                    $(this).find(urlClase).attr(href)
+                    divCard.attr(href) ||
                     $(this).attr(href) ||
-                    $(this).find(clase3).attr(href);
+                    $(this).find(clase3).attr(href)
                 
                 // esta es la url completa, en el back anda ok, pero no renderiza en front => undefined
                 articles.push({
@@ -166,9 +118,10 @@ async function solicitudURL(siteData, res) {
 
 app.get("/results", async (req, res) => {
     await solicitudURL(dataInfobae, res);
-    /* await solicitudURL(dataGuardian, res);
+    await solicitudURL(dataPagina12, res)
+    await solicitudURL(dataClarin, res)
+    await solicitudURL(dataAmbito, res);
     await solicitudURL(dataCNN, res);
-    await solicitudURL(dataAmbito, res); */
     res.json(container);
 });
 
