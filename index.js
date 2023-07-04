@@ -18,32 +18,23 @@ const dataInfobae = {
 };
 
 const dataPagina12 = {
-    name: 'Pagina 12',
-    url: 'https://www.pagina12.com.ar/',
+    name: "Pagina 12",
+    url: "https://www.pagina12.com.ar/",
     clase1: "article",
     clase2: ".article-title",
     clase3: "h2 a",
     imgClase: ".show-for-small-only ",
     href: "href",
-}
+};
 
 const dataClarin = {
-    name: 'Clarin',
-    url: 'https://www.clarin.com/',
+    name: "Clarin",
+    url: "https://www.clarin.com/",
     clase1: ".content-nota",
     clase2: ".mt",
     clase3: "h2",
     imgClase: "picture img",
-    urlClase: '.link_article',
-    href: "href",
-}
-
-const dataCNN = {
-    name: "CNN",
-    url: "https://cnnespanol.cnn.com/",
-    clase1: ".news__data",
-    clase2: ".news__title",
-    clase3: ".news__title > a",
+    urlClase: ".link_article",
     href: "href",
 };
 
@@ -54,10 +45,20 @@ const dataAmbito = {
     clase2: ".news-article__info-wrapper",
     clase3: ".news-article__title > a",
     imgClase: "a > .figure-img",
-    urlClase: 'figure a',
+    urlClase: "figure a",
     href: "href",
 };
 
+const dataPerfil = {
+    name: "Perfil",
+    url: "https://www.perfil.com/",
+    clase1: ".news",
+    clase2: ".news__data",
+    clase3: ".news__title",
+    imgClase: ".news__media .img-fluid",
+    urlClase: "a",
+    href: "href",
+};
 app.use(cors());
 
 // app.METHOD(PATH, HANDLER);
@@ -75,31 +76,32 @@ const container = [];
 
 async function solicitudURL(siteData, res) {
     // siteData.forEach((siteObject) => {
-    const { name, url, clase1, clase2, clase3, imgClase, href, urlClase } = siteData;
+    const { name, url, clase1, clase2, clase3, imgClase, href, urlClase } =
+        siteData;
     try {
         await axios(url).then((response) => {
             const html = response.data;
             const $ = cheerio.load(html);
             const articles = [];
-            
+
             $(clase1, html).each(function () {
-                const image = $(this).find(imgClase).attr('src')
+                const image = $(this).find(imgClase).attr("src");
                 const divCard = $(this).find(clase2);
-                const titleReceived = divCard.find(clase3).text() || $(this).find(clase3).text();
+                const titleReceived =
+                    divCard.find(clase3).text() || $(this).find(clase3).text();
                 // titleReceived = $(this).find().text
                 const title = sanitizerText(titleReceived);
-                
-                const url =
-                    $(this).find(urlClase).attr(href)
-                    divCard.attr(href) ||
+
+                const url = $(this).find(urlClase).attr(href);
+                divCard.attr(href) ||
                     $(this).attr(href) ||
-                    $(this).find(clase3).attr(href)
-                
+                    $(this).find(clase3).attr(href);
+
                 // esta es la url completa, en el back anda ok, pero no renderiza en front => undefined
                 articles.push({
                     title,
                     url,
-                    image
+                    image,
                 });
             });
             const firstArticles = articles.slice(0, 5);
@@ -117,11 +119,11 @@ async function solicitudURL(siteData, res) {
 }
 
 app.get("/results", async (req, res) => {
-    await solicitudURL(dataInfobae, res);
-    await solicitudURL(dataPagina12, res)
-    await solicitudURL(dataClarin, res)
-    await solicitudURL(dataAmbito, res);
-    await solicitudURL(dataCNN, res);
+    // await solicitudURL(dataInfobae, res);
+    // await solicitudURL(dataPagina12, res)
+    // await solicitudURL(dataClarin, res)
+    // await solicitudURL(dataAmbito, res);
+    await solicitudURL(dataPerfil, res);
     res.json(container);
 });
 
