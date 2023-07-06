@@ -15,6 +15,7 @@ const dataInfobae = {
     clase3: ".d23-story-card-hl",
     imgClase: ".d23-story-card-info a .d23-story-card-img",
     href: "href",
+    imageSite: 'https://www.infobae.com/pf/resources/images/logo_infobae_naranja.svg?d=1445',
 };
 
 const dataPagina12 = {
@@ -25,6 +26,7 @@ const dataPagina12 = {
     clase3: "h2 a",
     imgClase: ".show-for-small-only ",
     href: "href",
+    imageSite: 'https://www.pagina12.com.ar/assets/media/logos/amp/logo_pagina_12_n.svg?v=2.0.143',
 };
 
 const dataClarin = {
@@ -36,6 +38,7 @@ const dataClarin = {
     imgClase: "picture img",
     urlClase: ".link_article",
     href: "href",
+    imageSite: 'https://upload.wikimedia.org/wikipedia/commons/7/73/Clar%C3%ADn_logo.svg',
 };
 
 const dataAmbito = {
@@ -47,6 +50,7 @@ const dataAmbito = {
     imgClase: "a > .figure-img",
     urlClase: "figure a",
     href: "href",
+    imageSite: 'https://www.ambito.com/css-custom/239/v3/images/main-logo.svg',
 };
 
 const dataPerfil = {
@@ -58,6 +62,7 @@ const dataPerfil = {
     imgClase: ".news__media .img-fluid",
     urlClase: "a",
     href: "href",
+    imageSite: 'https://www.perfil.com/img/logo-perfil-header.png',
 };
 app.use(cors());
 
@@ -75,7 +80,7 @@ function sanitizerText(texto) {
 const container = [];
 
 async function solicitudURL(siteData, res) {
-    const { name, url, clase1, clase2, clase3, imgClase, href, urlClase } =
+    const { name, imageSite, url, clase1, clase2, clase3, imgClase, href, urlClase } =
         siteData;
     try {
         await axios(url).then((response) => {
@@ -102,7 +107,7 @@ async function solicitudURL(siteData, res) {
                 });
             });
             const firstArticles = articles.slice(0, 5);
-            const newPage = { name, firstArticles };
+            const newPage = { name, imageSite, firstArticles };
 
             const isInContainer = container.some(page => page.name === name)
             if(isInContainer) { return }
