@@ -107,7 +107,7 @@ async function solicitudURL(siteData, res) {
                     image,
                 });
             });
-            const firstArticles = articles.slice(0, 5);
+            const firstArticles = articles.slice(0, 8);
             const newPage = { name, imageSite, urlSite ,firstArticles };
 
             const isInContainer = container.some(page => page.name === name)
