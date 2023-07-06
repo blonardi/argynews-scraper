@@ -9,29 +9,31 @@ const cors = require("cors");
 
 const dataInfobae = {
     name: "Infobae",
-    url: "https://www.infobae.com",
+    urlSite: "https://www.infobae.com",
     clase1: ".d23-story-card-ctn",
     clase2: "a.headline-link",
     clase3: ".d23-story-card-hl",
     imgClase: ".d23-story-card-info a .d23-story-card-img",
     href: "href",
+    urlClase: "a.headline-link",
     imageSite: 'https://www.infobae.com/pf/resources/images/logo_infobae_naranja.svg?d=1445',
 };
 
 const dataPagina12 = {
     name: "Pagina 12",
-    url: "https://www.pagina12.com.ar/",
+    urlSite: "https://www.pagina12.com.ar/",
     clase1: "article",
     clase2: ".article-title",
     clase3: "h2 a",
     imgClase: ".show-for-small-only ",
     href: "href",
+    urlClase: ".headline-content a",
     imageSite: 'https://www.pagina12.com.ar/assets/media/logos/amp/logo_pagina_12_n.svg?v=2.0.143',
 };
 
 const dataClarin = {
     name: "Clarin",
-    url: "https://www.clarin.com/",
+    urlSite: "https://www.clarin.com/",
     clase1: ".content-nota",
     clase2: ".mt",
     clase3: "h2",
@@ -43,19 +45,19 @@ const dataClarin = {
 
 const dataAmbito = {
     name: "Ambito Financiero",
-    url: "https://www.ambito.com/",
+    urlSite: "https://www.ambito.com/",
     clase1: ".news-article",
     clase2: ".news-article__info-wrapper",
     clase3: ".news-article__title > a",
     imgClase: "a > .figure-img",
-    urlClase: "figure a",
+    urlClase: ".news-article__title a",
     href: "href",
     imageSite: 'https://www.ambito.com/css-custom/239/v3/images/main-logo.svg',
 };
 
 const dataPerfil = {
     name: "Perfil",
-    url: "https://www.perfil.com/",
+    urlSite: "https://www.perfil.com/",
     clase1: ".news",
     clase2: ".news__data",
     clase3: ".news__title",
@@ -80,10 +82,10 @@ function sanitizerText(texto) {
 const container = [];
 
 async function solicitudURL(siteData, res) {
-    const { name, imageSite, url, clase1, clase2, clase3, imgClase, href, urlClase } =
+    const { name, imageSite, clase1, clase2, clase3, imgClase, href, urlClase, urlSite } =
         siteData;
     try {
-        await axios(url).then((response) => {
+        await axios(urlSite).then((response) => {
             const html = response.data;
             const $ = cheerio.load(html);
             const articles = [];
@@ -94,12 +96,11 @@ async function solicitudURL(siteData, res) {
                 const titleReceived =
                     divCard.find(clase3).text() || $(this).find(clase3).text();
                 const title = sanitizerText(titleReceived);
-
                 const url = $(this).find(urlClase).attr(href);
                 divCard.attr(href) ||
                     $(this).attr(href) ||
                     $(this).find(clase3).attr(href);
-
+                
                 articles.push({
                     title,
                     url,
@@ -107,7 +108,7 @@ async function solicitudURL(siteData, res) {
                 });
             });
             const firstArticles = articles.slice(0, 5);
-            const newPage = { name, imageSite, firstArticles };
+            const newPage = { name, imageSite, urlSite ,firstArticles };
 
             const isInContainer = container.some(page => page.name === name)
             if(isInContainer) { return }
