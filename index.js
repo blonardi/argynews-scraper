@@ -75,7 +75,6 @@ function sanitizerText(texto) {
 const container = [];
 
 async function solicitudURL(siteData, res) {
-    // siteData.forEach((siteObject) => {
     const { name, url, clase1, clase2, clase3, imgClase, href, urlClase } =
         siteData;
     try {
@@ -89,7 +88,6 @@ async function solicitudURL(siteData, res) {
                 const divCard = $(this).find(clase2);
                 const titleReceived =
                     divCard.find(clase3).text() || $(this).find(clase3).text();
-                // titleReceived = $(this).find().text
                 const title = sanitizerText(titleReceived);
 
                 const url = $(this).find(urlClase).attr(href);
@@ -97,7 +95,6 @@ async function solicitudURL(siteData, res) {
                     $(this).attr(href) ||
                     $(this).find(clase3).attr(href);
 
-                // esta es la url completa, en el back anda ok, pero no renderiza en front => undefined
                 articles.push({
                     title,
                     url,
@@ -106,9 +103,11 @@ async function solicitudURL(siteData, res) {
             });
             const firstArticles = articles.slice(0, 5);
             const newPage = { name, firstArticles };
+
+            const isInContainer = container.some(page => page.name === name)
+            if(isInContainer) { return }
+
             container.push(newPage);
-            // return firstArticles
-            // return { site: name, articles };
         });
     } catch (err) {
         console.error(err);
@@ -119,10 +118,10 @@ async function solicitudURL(siteData, res) {
 }
 
 app.get("/results", async (req, res) => {
-    // await solicitudURL(dataInfobae, res);
-    // await solicitudURL(dataPagina12, res)
-    // await solicitudURL(dataClarin, res)
-    // await solicitudURL(dataAmbito, res);
+    await solicitudURL(dataInfobae, res);
+    await solicitudURL(dataPagina12, res)
+    await solicitudURL(dataClarin, res)
+    await solicitudURL(dataAmbito, res);
     await solicitudURL(dataPerfil, res);
     res.json(container);
 });
