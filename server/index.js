@@ -1,4 +1,4 @@
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 
 const express = require("express");
 const app = express();
@@ -16,7 +16,8 @@ const dataInfobae = {
     imgClase: ".d23-story-card-info a .d23-story-card-img",
     href: "href",
     urlClase: "a.headline-link",
-    imageSite: 'https://www.infobae.com/pf/resources/images/logo_infobae_naranja.svg?d=1445',
+    imageSite:
+        "https://www.infobae.com/pf/resources/images/logo_infobae_naranja.svg?d=1445",
 };
 
 const dataPagina12 = {
@@ -28,7 +29,8 @@ const dataPagina12 = {
     imgClase: ".show-for-small-only ",
     href: "href",
     urlClase: ".headline-content a",
-    imageSite: 'https://www.pagina12.com.ar/assets/media/logos/amp/logo_pagina_12_n.svg?v=2.0.143',
+    imageSite:
+        "https://www.pagina12.com.ar/assets/media/logos/amp/logo_pagina_12_n.svg?v=2.0.143",
 };
 
 const dataClarin = {
@@ -40,7 +42,8 @@ const dataClarin = {
     imgClase: "picture img",
     urlClase: ".link_article",
     href: "href",
-    imageSite: 'https://upload.wikimedia.org/wikipedia/commons/7/73/Clar%C3%ADn_logo.svg',
+    imageSite:
+        "https://upload.wikimedia.org/wikipedia/commons/7/73/Clar%C3%ADn_logo.svg",
 };
 
 const dataAmbito = {
@@ -52,7 +55,7 @@ const dataAmbito = {
     imgClase: "a > .figure-img",
     urlClase: ".news-article__title a",
     href: "href",
-    imageSite: 'https://www.ambito.com/css-custom/239/v3/images/main-logo.svg',
+    imageSite: "https://www.ambito.com/css-custom/239/v3/images/main-logo.svg",
 };
 
 const dataPerfil = {
@@ -64,7 +67,7 @@ const dataPerfil = {
     imgClase: ".news__media .img-fluid",
     urlClase: "a",
     href: "href",
-    imageSite: 'https://www.perfil.com/img/logo-perfil-header.png',
+    imageSite: "https://www.perfil.com/img/logo-perfil-header.png",
 };
 app.use(cors());
 
@@ -82,9 +85,18 @@ function sanitizerText(texto) {
 const container = [];
 
 async function solicitudURL(siteData, res) {
-    const limit = 8
-    const { name, imageSite, clase1, clase2, clase3, imgClase, href, urlClase, urlSite } =
-        siteData;
+    const limit = 8;
+    const {
+        name,
+        imageSite,
+        clase1,
+        clase2,
+        clase3,
+        imgClase,
+        href,
+        urlClase,
+        urlSite,
+    } = siteData;
     try {
         await axios(urlSite).then((response) => {
             const html = response.data;
@@ -95,16 +107,17 @@ async function solicitudURL(siteData, res) {
                 const image = $(this).find(imgClase).attr("src");
                 const divCard = $(this).find(clase2);
                 const titleReceived =
-                    divCard.find(clase3).text() 
-                    || $(this).find(clase3).text();
+                    divCard.find(clase3).text() || $(this).find(clase3).text();
                 const title = sanitizerText(titleReceived);
                 const url = $(this).find(urlClase).attr(href);
                 divCard.attr(href) ||
                     $(this).attr(href) ||
                     $(this).find(clase3).attr(href);
-                
-                const isFull = articles.length === limit
-                if(isFull){ return }
+
+                const isFull = articles.length === limit;
+                if (isFull) {
+                    return;
+                }
 
                 articles.push({
                     title,
@@ -113,11 +126,13 @@ async function solicitudURL(siteData, res) {
                 });
             });
             // const firstArticles = articles.slice(0, 8);
-            const firstArticles = articles
-            const newPage = { name, imageSite, urlSite ,firstArticles };
+            const firstArticles = articles;
+            const newPage = { name, imageSite, urlSite, firstArticles };
 
-            const isInContainer = container.some(page => page.name === name)
-            if(isInContainer) { return }
+            const isInContainer = container.some((page) => page.name === name);
+            if (isInContainer) {
+                return;
+            }
 
             container.push(newPage);
         });
@@ -131,8 +146,8 @@ async function solicitudURL(siteData, res) {
 
 app.get("/results", async (req, res) => {
     await solicitudURL(dataInfobae, res);
-    await solicitudURL(dataPagina12, res)
-    await solicitudURL(dataClarin, res)
+    await solicitudURL(dataPagina12, res);
+    await solicitudURL(dataClarin, res);
     await solicitudURL(dataAmbito, res);
     await solicitudURL(dataPerfil, res);
     res.json(container);
