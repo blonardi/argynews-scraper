@@ -1,0 +1,29 @@
+header{
+    width: 100%;
+    background-color: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    font-size: var(--px3);
+    padding: var(--paddingTop);
+}
+
+header h1{
+    font-size: var(--fontSizeHeading);  
+    color: var(--white);
+    letter-spacing: 2px;
+}
+
+header h1::after{
+    content: '🧉';
+}
+header h1::before{
+    content: '🥟';
+}
+
+@media (max-width: 992px) {
+    header h1{
+        font-size: var(--fontSizeBody);  
+    }
+}

@@ -1,0 +1,28 @@
+.row-new{
+    display: flex;
+    flex-direction: column;
+    gap: var(--px2);
+    padding-bottom: var(--px5);
+    border-bottom: 1px solid var(--black);
+}
+
+.row-new_scroll{
+    
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    /* overflow-x: auto; */
+}
+
+.row-new_scroll .card-new{
+    margin-top: var(--px5);
+}
+
+@media (max-width: 992px) {
+    .row-new_scroll{
+        justify-content: center;
+        gap: var(--px2);
+    }
+}

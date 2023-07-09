@@ -1,0 +1,5 @@
+.title-container{
+    display: flex;
+    width: 100%;
+    padding-right:var(--px1);
+}

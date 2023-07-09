@@ -1,0 +1,7 @@
+.container-news{
+    padding: 0 var(--paddingLeft);
+    display: flex;
+    flex-direction: column;
+    gap: var(--px6);
+}
+
