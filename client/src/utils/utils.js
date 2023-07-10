@@ -1,4 +1,5 @@
-export const myUrl = "http://localhost:8000/api/data";
+export const myUrl =
+    "https://simple-express-scraper-blonardi.vercel.app/api/data";
 
 export async function getArticles() {
     const response = await fetch(myUrl);
