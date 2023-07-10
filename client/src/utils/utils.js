@@ -1,4 +1,4 @@
-export const myUrl = "/api/data";
+export const myUrl = "http://localhost:8000/api/data";
 
 export async function getArticles() {
     const response = await fetch(myUrl);
