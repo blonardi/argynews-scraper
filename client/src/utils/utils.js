@@ -1,8 +1,11 @@
-export const myUrl =
-    "https://simple-express-scraper-blonardi.vercel.app/api/data";
+const NODE_ENV  = process.env.NODE_ENV
+
+const localUrl = 'http://localhost:8000/api/data'
+const vercelUrl = "https://simple-express-scraper-blonardi.vercel.app/api/data";
+const urlToFetch = NODE_ENV === 'development' ? localUrl : vercelUrl
 
 export async function getArticles() {
-    const response = await fetch(myUrl);
+    const response = await fetch(urlToFetch);
     const data = await response.json();
     return data;
 }

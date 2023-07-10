@@ -5,10 +5,8 @@ import useGetArticle from './hooks/useGetArticles'
 
 function App() {
   const { allArticles, isLoading, error } = useGetArticle()
-
   return (
     <main>
-
       < Header />
 
       <section className='container-news container'>
