@@ -5,3 +5,6 @@
     gap: var(--px6);
 }
 
+.placeholder-grid{
+   display: flex;
+}

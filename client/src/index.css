@@ -47,3 +47,7 @@ body{
 a{
     color:  var(--black)
 }
+
+.inactive{
+   display: none;
+}
