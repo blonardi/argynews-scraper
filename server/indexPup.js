@@ -34,15 +34,20 @@ async function scrollDownAndGetImages(urlSite, titleClass) {
 
    const cards = await page.$$(".d23-story-card-ctn");
 
+   const cardss = await page.$$eval(".d23-story-card-ctn", cards => cards.map(card => {
+      console.log(card)
+   }) );
+
+/* 
    let container = [];
    for (let card of cards) {
       const title = card.querySelector('.headline-link h2')
       container.push(title)
-   }
+   } */
 
-   console.log(container)
+/*    console.log(container) */
 
-   /*    const imageUrls = await page.$$eval(
+/*       const imageUrls = await page.$$eval(
          imageClass,
          (imgs) => imgs.map((img) => img.src)
       ); */
