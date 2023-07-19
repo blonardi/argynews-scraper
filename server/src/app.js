@@ -1,21 +1,20 @@
-const PORT = process.env.PORT || 8000;
+// const PORT = process.env.PORT || 8000;
 
-const express = require("express");
-const app = express();
+// import express from "express";
+// import cors from "cors";
 
-const axios = require("axios");
-const cheerio = require("cheerio");
-const cors = require("cors");
+// const app = express();
+// const cors = require("cors");
+// app.use(cors());
+
+import puppeteer, { PuppeteerNode } from "puppeteer";
 
 const dataInfobae = {
     name: "Infobae",
     urlSite: "https://www.infobae.com",
-    clase1: ".d23-story-card-ctn",
-    clase2: "a.headline-link",
-    clase3: ".d23-story-card-hl",
-    imgClase: ".d23-story-card-info a .d23-story-card-img",
-    href: "href",
-    urlClase: "a.headline-link",
+    cardClass: ".d23-story-card-ctn",
+    titleClass: ".headline-link h2",
+    imageClass: ".d23-story-card-info a .d23-story-card-img",
     imageSite:
         "https://www.infobae.com/pf/resources/images/logo_infobae_naranja.svg?d=1445",
 };
@@ -69,92 +68,112 @@ const dataPerfil = {
     href: "href",
     imageSite: "https://www.perfil.com/img/logo-perfil-header.png",
 };
-app.use(cors());
 
-// app.METHOD(PATH, HANDLER);
-
-app.get("/", function (req, res) {
-    res.json("This is my webscraper with node");
-});
-
-function sanitizerText(texto) {
-    // asercion, va a empezar o finalizar con x cosa
-    const sanitiziedText = texto.replace(/\t+/g, " ").trim();
-    return sanitiziedText;
-}
 const container = [];
+async function solicitudURL(siteData) {
+    const { name, imageSite, urlSite, cardClass, titleClass, imageClass } =
+        siteData;
 
-async function solicitudURL(siteData, res) {
-    const limit = 8;
-    const {
-        name,
-        imageSite,
-        clase1,
-        clase2,
-        clase3,
-        imgClase,
-        href,
-        urlClase,
-        urlSite,
-    } = siteData;
-    try {
-        await axios(urlSite).then((response) => {
-            const html = response.data;
-            const $ = cheerio.load(html);
-            const articles = [];
+    const browser = await puppeteer.launch({
+        headless: false,
+        slowMo: 200,
+    });
+    const page = await browser.newPage();
 
-            $(clase1, html).each(function () {
-                const image = $(this).find(imgClase).attr("src");
-                const divCard = $(this).find(clase2);
-                const titleReceived =
-                    divCard.find(clase3).text() || $(this).find(clase3).text();
-                const title = sanitizerText(titleReceived);
-                const url = $(this).find(urlClase).attr(href);
-                divCard.attr(href) ||
-                    $(this).attr(href) ||
-                    $(this).find(clase3).attr(href);
+    await page.goto(urlSite);
+    // await page.waitForNavigation({ waitUntil: "domcontentloaded" });
 
-                const isFull = articles.length === limit;
-                if (isFull) {
-                    return;
+    // Función que se ejecutará en el contexto de la página
+    const scrollDown = async () => {
+        // Desplázate hacia abajo hasta el final de la página
+        await new Promise((resolve) => {
+            const distance = 100; // Distancia de desplazamiento
+            const delay = 100; // Retardo entre desplazamientos
+            const timer = setInterval(() => {
+                window.scrollBy(0, distance);
+                if (
+                    window.innerHeight + window.pageYOffset >=
+                    document.body.scrollHeight
+                ) {
+                    clearInterval(timer);
+                    resolve();
                 }
+            }, delay);
+        });
+    };
 
-                articles.push({
-                    title,
-                    url,
-                    image,
-                });
-            });
-            // const firstArticles = articles.slice(0, 8);
-            const firstArticles = articles;
-            const newPage = { name, imageSite, urlSite, firstArticles };
+    // Ejecuta la función de desplazamiento en la página
+    await page.evaluate(scrollDown);
+    const defaultImageUrl =
+        "https://www.alcaldianeiva.gov.co/NuestraAlcaldia/SalaDePrensa/PublishingImages/$$PRUEBA%20NOTICIA.png";
 
-            const isInContainer = container.some((page) => page.name === name);
-            if (isInContainer) {
+    const articles = [];
+    const limit = 8;
+    const cards = await page.$$(cardClass);
+    for (const card of cards) {
+        try {
+            // Espero elementos, titulos e imagen
+            const titleElement = await card.$(titleClass);
+            const imgElement = await card.$(imageClass);
+
+            const titulo = await titleElement.evaluate(
+                (el) => (el ? el.textContent : null),
+                titleElement
+            );
+            let imgSrc;
+            try {
+                imgSrc = await imgElement.evaluate(
+                    (el) => el.getAttribute("src"),
+                    imgElement
+                );
+            } catch (error) {
+                console.error("Error al obtener imagenSelector:", error);
+                imgSrc = defaultImageUrl;
+            }
+
+            const isFull = articles.length === limit;
+            if (isFull) {
                 return;
             }
 
-            container.push(newPage);
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            error: "Ocurrió un error en la solicitud.",
-        });
+            articles.push({
+                titulo,
+                imgSrc,
+            });
+
+            // const isInContainer = container.some((page) => page.name === name);
+            // if (isInContainer) {
+            //     return;
+            // }
+
+            console.log("Título:", titulo);
+            console.log("Imagen:", imgSrc);
+        } catch (error) {
+            console.error("Error en el bucle:", error);
+            // res.status(500).json({
+            //     error: "Ocurrió un error en la solicitud.",
+            // });
+        }
     }
+
+    const firstArticles = articles;
+    const newPage = { name, imageSite, urlSite, firstArticles };
+    container.push(newPage);
+
+    console.log(container);
+
+    await browser.close();
 }
 
-app.get("/api/data", async (req, res) => {
-    await solicitudURL(dataInfobae, res);
-    await solicitudURL(dataPagina12, res);
-    await solicitudURL(dataClarin, res);
-    await solicitudURL(dataAmbito, res);
-    await solicitudURL(dataPerfil, res);
-    res.json(container);
-});
+// scrollDownAndGetImages("https://ambito.com",".news-article > figure > a > .figure-img");
 
-// app.listen(PORT, () =>
-//     console.log(`Servidor escuchando en el puerto: ${PORT}`)
-// );
+await solicitudURL(dataInfobae);
 
-module.exports = app;
+// app.get("/api/data", async (req, res) => {
+//     await solicitudURL(dataInfobae, res);
+
+//     res.json(container);
+// });
+
+// module.exports = app;
+// export default app;
