@@ -10,10 +10,10 @@ const cors = require("cors");
 const dataInfobae = {
     name: "Infobae",
     urlSite: "https://www.infobae.com",
-    clase1: ".d23-story-card-ctn",
+    clase1: ".story-card-ctn",
     clase2: "a.headline-link",
-    clase3: ".d23-story-card-hl",
-    imgClase: ".d23-story-card-info a .d23-story-card-img",
+    clase3: ".story-card-hl",
+    imgClase: ".story-card-info a .story-card-img",
     href: "href",
     urlClase: "a.headline-link",
     imageSite:
