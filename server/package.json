@@ -10,7 +10,7 @@
         "start": "node index.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "keywords": [node, scraping, news, kumpel],
+    "keywords": ["node", "scraping", "news", "kumpel"],
     "author": "",
     "license": "ISC",
     "dependencies": {
