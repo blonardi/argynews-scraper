@@ -10,7 +10,7 @@
     /* medidas */
     --px1: 10px;
     --px2: 20px;
-    --px3: 30px;
+    --px3: 35px;
     --px4: 40px;
     --px5: 50px;
     --px6: 60px;
@@ -19,6 +19,7 @@
     --black: #000;
     --white: #fff;
     --red: #e92c2c;
+    --blueTitle: #0078d3;
 
     /* margenes y paddings */
     --paddingTop: var(--px3);

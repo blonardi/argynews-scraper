@@ -4,6 +4,7 @@ import Header from './components/Header'
 import LoadingSpinner from './components/LoadingSpinner'
 import RowNew from './container/RowNew'
 import useGetArticle from './hooks/useGetArticles'
+import Footer from './components/Footer'
 
 function App() {
    const { allArticles, isLoading, error } = useGetArticle()
@@ -41,7 +42,8 @@ function App() {
                /* footer */
             }
          </section>
-
+         
+         < Footer />
       </main>
    )
 }

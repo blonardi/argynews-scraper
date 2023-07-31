@@ -1,3 +1,6 @@
+main{
+    background: #f8fafc;
+}
 .container-news{
     padding: 0 var(--paddingLeft);
     display: flex;

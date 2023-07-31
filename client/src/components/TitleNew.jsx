@@ -3,7 +3,7 @@ import './TitleNew.css'
 export default function TitleNew({title}) {
   return (
     <div className='title-container'>
-        <h2 className='title-new'>{title}</h2>
+        <p className='title-new'>{title}</p>
     </div>
   )
 }

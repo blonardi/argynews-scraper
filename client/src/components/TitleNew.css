@@ -1,5 +1,10 @@
 .title-container{
     display: flex;
     width: 100%;
-    padding-right:var(--px1);
+    padding:var(--px1);
+}
+
+.title-new{
+    font-size: 24px;
+    font-weight: 600;
 }

@@ -1,26 +1,69 @@
+
+@font-face {
+    font-family: 'DrymePersonal'; /* Define el nombre de la fuente personalizada */
+    src: url('../assets/fonts/DrymePersonal.ttf') format('truetype'); /* Ruta de la fuente */
+}
+
 header{
     width: 100%;
     background-color: var(--black);
     display: flex;
     align-items: center;
     justify-content: center;
-    
+    background-image: url('../assets/bannerArg.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 1;
     font-size: var(--px3);
-    padding: var(--paddingTop);
+
+}
+header .h-container {
+    min-height: 96px;
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.headerBox{
+    height: auto;
+    min-width: 320px;
+    display: flex;
+    justify-content: center;
 }
 
 header h1{
-    font-size: var(--fontSizeHeading);  
+    width: auto;
+    height: auto;
+    font-family: 'DrymePersonal', sans-serif; /* Aplica la fuente personalizada */
+    font-size: var(--fontSizeHeading);
     color: var(--white);
+    
     letter-spacing: 2px;
 }
 
-header h1::after{
+.liveTimeBox{
+    width: auto;
+    height: auto;
+
+    padding: 6px 8px;
+    border-radius: 12px;
+    background: #f0f9ff;
+    opacity: 0.5;
+}
+
+.liveTime{
+    display: block;
+    color: darkblue;
+}
+
+/* header h1::after{
     content: '🧉';
 }
+
 header h1::before{
     content: '🥟';
-}
+} */
 
 @media (max-width: 992px) {
     header h1{
