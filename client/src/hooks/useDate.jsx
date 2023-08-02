@@ -13,9 +13,14 @@ const useDate = () => {
       }
     }, []);
 
-    const day = today.toLocaleDateString(locale, { weekday: 'long' });
-    const date = `${today.getDate()} ${today.toLocaleDateString(locale, { month: 'long' })}\n\n`;
+    // const day = today.toLocaleDateString(locale, { weekday: 'long' });
+    // const date = `${today.getDate()} ${today.toLocaleDateString(locale, { month: 'long' })}\n\n`;
 
+
+    const fullMonth = today.toLocaleDateString(locale, { month: 'long' });
+    const capitalizedMonth = fullMonth.charAt(0).toUpperCase() + fullMonth.slice(1);
+
+    const date = `${today.getDate()} ${capitalizedMonth}\n\n`;
     // const hour = today.getHours();
     // const wish = `Good ${(hour < 12 && 'Morning') || (hour < 17 && 'Afternoon') || 'Evening'}`;
 

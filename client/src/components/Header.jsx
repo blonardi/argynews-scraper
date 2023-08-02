@@ -16,7 +16,7 @@ export default function Header() {
         </div>
         <div className='headerBox'>
           <div className='liveTimeBox'>
-            <p className='liveTime'>{date} - {time}</p>
+            <p className='liveTime'>{date} | {time}</p>
           </div>
         </div>  
       </div>
