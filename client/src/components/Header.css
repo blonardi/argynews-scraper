@@ -25,14 +25,14 @@ header .h-container {
     align-items: center;
 }
 
-.headerBox{
+.headerBox {
     height: auto;
     min-width: 320px;
     display: flex;
     justify-content: center;
 }
 
-header h1{
+header h1 {
     width: auto;
     height: auto;
     font-family: 'DrymePersonal', sans-serif; /* Aplica la fuente personalizada */
@@ -42,7 +42,7 @@ header h1{
     letter-spacing: 2px;
 }
 
-.liveTimeBox{
+.liveTimeBox {
     width: auto;
     height: auto;
 
@@ -54,6 +54,7 @@ header h1{
 
 .liveTime{
     display: block;
+    font-size: 32px;
     color: darkblue;
 }
 
