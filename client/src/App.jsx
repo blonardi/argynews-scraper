@@ -11,7 +11,6 @@ function App() {
    return (
       <main>
          < Header />
-
          <section className='container-news container'>
             {
                isLoading &&
@@ -38,11 +37,7 @@ function App() {
                   )
                })
             }
-            {
-               /* footer */
-            }
-         </section>
-         
+         </section>         
          < Footer />
       </main>
    )
