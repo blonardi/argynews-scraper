@@ -147,8 +147,8 @@ async function solicitudURL(siteData, res) {
 app.get("/api/data", async (req, res) => {
     await solicitudURL(dataInfobae, res);
     await solicitudURL(dataPagina12, res);
-    await solicitudURL(dataClarin, res);
-    await solicitudURL(dataAmbito, res);
+    //await solicitudURL(dataClarin, res);
+    //await solicitudURL(dataAmbito, res);
     await solicitudURL(dataPerfil, res);
     res.json(container);
 });
