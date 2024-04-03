@@ -1,6 +1,6 @@
 const NODE_ENV  = process.env.NODE_ENV
 
-const localUrl = 'http://localhost:8000/api/data'
+const localUrl = 'http://localhost:8080/api/data'
 const vercelUrl = "https://simple-express-scraper-blonardi.vercel.app/api/data";
 const urlToFetch = NODE_ENV === 'development' ? localUrl : vercelUrl
 
