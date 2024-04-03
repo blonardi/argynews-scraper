@@ -3,14 +3,20 @@
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
+    "type": "module",
     "engines": {
         "node": "16.x"
     },
     "scripts": {
-        "start": "node index.js",
+        "start": "nodemon index.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "keywords": ["node", "scraping", "news", "kumpel"],
+    "keywords": [
+        "node",
+        "scraping",
+        "news",
+        "kumpel"
+    ],
     "author": "",
     "license": "ISC",
     "dependencies": {
@@ -19,6 +25,10 @@
         "cors": "^2.8.5",
         "dotenv": "^16.3.1",
         "express": "^4.18.2",
-        "vercel": "^31.0.1"
+        "puppeteer": "^22.6.1",
+        "vercel": "^33.6.2"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.0"
     }
 }
