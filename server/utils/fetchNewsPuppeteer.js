@@ -1,68 +1,88 @@
 import puppeteer from 'puppeteer';
-//import { sanitizerText } from './sanitizerText.js';
 
-export async function fetchNewsPuppeteer(siteData, res, container) {
-	const limit = 8;
-	const {
-			name,
-			imageSite,
-			clase1,
-			clase2,
-			clase3,
-			imgClase,
-			href,
-			urlClase,
-			urlSite,
-	} = siteData;
+let browser;
+let pagePool = [];
+const MAX_POOL_SIZE = 5; // Ajusta este número según tus necesidades
 
-	try {
-			const browser = await puppeteer.launch();
-			const page = await browser.newPage();
-			await page.goto(urlSite, { timeout: 60000 });
+async function initBrowser() {
+	if (!browser) {
+		browser = await puppeteer.launch();
+	}
+	return browser;
+}
 
-			// Esperar a que se carguen los elementos
-			const selector = clase1 ? clase1 : 'article';
-			await page.waitForSelector(selector);
+async function getPage() {
+	if (pagePool.length > 0) {
+		return pagePool.pop();
+	}
+	const browser = await initBrowser();
+	return browser.newPage();
+}
 
-			// Esperar a que se carguen las imágenes
-			await page.waitForSelector(imgClase);
-
-			// Extraer datos de la página con Puppeteer
-			const articles = await page.$$eval(selector, (elements, clase3, imgClase, href, urlClase, limit) => {
-					const filteredArticles = [];
-					let count = 0;
-
-					elements.forEach(element => {
-							if (count >= limit) return; // Salir del bucle si ya alcanzamos el límite
-
-							const image = element.querySelector(imgClase)?.getAttribute('src');
-							const title = element.querySelector(clase3)?.textContent.trim();
-							const url = element.querySelector(urlClase)?.getAttribute(href);
-
-							if (image && title && url) {
-									filteredArticles.push({ title, url, image });
-									count++; // Incrementar el contador de artículos válidos
-							}
-					});
-
-					return filteredArticles;
-			}, clase3, imgClase, href, urlClase, limit);
-
-			await browser.close();
-
-			// Procesar los artículos obtenidos
-			const newPage = { name, imageSite, urlSite, firstArticles: articles };
-
-			// Verificar si el sitio ya está en el contenedor
-			const isInContainer = container.some((page) => page.name === name);
-			if (!isInContainer) {
-					container.push(newPage);
-			}
-	} catch (err) {
-		console.error("Error al cargar la página:", err);
-		// Maneja el error de tiempo de espera adecuadamente, por ejemplo, respondiendo con un mensaje de error
-		res.status(500).json({ error: "Error de tiempo de espera al cargar la página" });
+async function releasePage(page) {
+	if (pagePool.length < MAX_POOL_SIZE) {
+		await page.goto('about:blank'); // Limpia la página
+		pagePool.push(page);
+	} else {
+		await page.close();
 	}
 }
 
+export async function fetchNewsPuppeteer(siteData) {
+	const { name, imageSite, clase1, clase2, clase3, imgClase, href, urlClase, urlSite } = siteData;
+	const limit = 8;
+	let page;
+	try {
+		page = await getPage();
+		await page.goto(urlSite, { timeout: 30000, waitUntil: 'domcontentloaded' });
 
+		// Esperar a que se carguen los elementos
+		const selector = clase1 || 'article';
+		await page.waitForSelector(selector, { timeout: 10000 });
+
+		// Esperar a que se carguen las imágenes
+		await page.waitForSelector(imgClase, { timeout: 10000 });
+
+		// Extraer datos de la página con Puppeteer
+		const articles = await page.$$eval(selector, (elements, params) => {
+			const { clase3, imgClase, href, urlClase, limit } = params;
+			const filteredArticles = [];
+			let count = 0;
+
+			for (const element of elements) {
+				if (count >= limit) break; // Salir del bucle si ya alcanzamos el límite
+
+				const imageSrc = element.querySelector(imgClase)?.getAttribute('src');
+				const image = imageSrc ? imageSrc.split(' ')[0] : ''; // Dividir la imagen por un espacio y obtener la primera posición
+				const title = element.querySelector(clase3)?.textContent.trim();
+				const url = element.querySelector(urlClase)?.getAttribute(href);
+
+				if (image && title && url) {
+					filteredArticles.push({ title, url, image });
+					count++; // Incrementar el contador de artículos válidos
+				}
+			}
+
+			return filteredArticles;
+		}, { clase3, imgClase, href, urlClase, limit });
+
+		// Procesar los artículos obtenidos
+		return { name, imageSite, urlSite, firstArticles: articles };
+	} catch (err) {
+		console.error("Error al cargar la página:", err);
+		throw err;
+	} finally {
+		if (page) {
+			await releasePage(page);
+		}
+	}
+}
+
+export async function closeBrowser() {
+	if (browser) {
+		await Promise.all(pagePool.map(page => page.close()));
+		await browser.close();
+		browser = null;
+		pagePool = [];
+	}
+}
