@@ -1,23 +1,21 @@
-//import puppeteer from 'puppeteer';
-let chrome = {}
+let chrome = {};
 let puppeteer;
-
-if (process.env.AWS.LAMBDA_FUNCTION_VERSION) {
-	chrome = import('@sparticuz/chromium')
-	puppeteer = import('puppeteer-core')
-} else {
-	puppeteer = import('puppeteer')
-}
-
 let browser;
 let pagePool = [];
 const MAX_POOL_SIZE = 5; // Ajusta este número según tus necesidades
 
+// Función para importar los módulos de manera asincrónica
+async function importModules() {
+	if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
+		chrome = await import('@sparticuz/chromium');
+		puppeteer = await import('puppeteer-core');
+	} else {
+		puppeteer = await import('puppeteer');
+	}
+}
 
-
-
+// Inicializa el navegador
 async function initBrowser() {
-
 	let options = {};
 	if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
 		options = {
@@ -33,6 +31,12 @@ async function initBrowser() {
 	}
 	return browser;
 }
+
+// Llama a la función de importación de módulos antes de usar Puppeteer
+(async () => {
+	await importModules();
+	await initBrowser();
+})();
 
 async function getPage() {
 	if (pagePool.length > 0) {
