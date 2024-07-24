@@ -1,17 +1,35 @@
-import puppeteer from 'puppeteer';
+//import puppeteer from 'puppeteer';
+let chrome = {}
+let puppeteer;
+
+if (process.env.AWS.LAMBDA_FUNCTION_VERSION) {
+	chrome = import('@sparticuz/chromium')
+	puppeteer = import('puppeteer-core')
+} else {
+	puppeteer = import('puppeteer')
+}
 
 let browser;
 let pagePool = [];
 const MAX_POOL_SIZE = 5; // Ajusta este número según tus necesidades
 
+
+
+
 async function initBrowser() {
+
+	let options = {};
+	if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
+		options = {
+			args: [...chrome.args, "--hide-scrollbars", "--disable-web-security"],
+			defaultViewport: chrome.defaultViewport,
+			executablePath: await chrome.executablePath,
+			headless: true,
+			ignoreHTTPSErrors: true,
+		};
+	}
 	if (!browser) {
-		browser = await puppeteer.launch({
-			args: [
-				'--no-sandbox',
-				'--disable-setuid-sandbox'
-			]
-		});
+		browser = await puppeteer.launch(options);
 	}
 	return browser;
 }
