@@ -1,4 +1,4 @@
-const PORT = process.env.PORT || 8080;
+//const PORT = process.env.PORT || 8000;
 
 
 import express from 'express'
@@ -37,7 +37,7 @@ app.get("/api/data", async (req, res) => {
 				}
 			});
 		}
-
+		console.log(container)
 		res.json(container);
 	} catch (error) {
 		console.error("Error al obtener datos:", error);
@@ -51,8 +51,8 @@ process.on('SIGINT', async () => {
 });
 
 
-app.listen(PORT, () => {
-	console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
+//app.listen(PORT, () => {
+//	console.log(`Servidor corriendo en http://localhost:${PORT}`);
+//});
 
 export default app;
